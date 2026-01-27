@@ -43,5 +43,3 @@ class TestOAuthProviderConfig:
             redirect_uri="http://localhost:3000/callback",
         )
         assert config.name == "github"
-
-

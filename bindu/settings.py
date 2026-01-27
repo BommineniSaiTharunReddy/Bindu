@@ -6,7 +6,7 @@ This module defines the configuration settings for the application using pydanti
 from pydantic import Field, computed_field, validator, BaseModel, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AliasChoices
-from typing import Literal, Any, Dict, List, Optional
+from typing import Literal, Optional
 
 
 class ProjectSettings(BaseSettings):

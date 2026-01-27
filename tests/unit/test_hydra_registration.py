@@ -244,7 +244,6 @@ class TestRegisterAgentInHydra:
     @pytest.mark.asyncio
     async def test_registration_disabled(self):
         """Test when auto-registration is disabled."""
-        from bindu.auth.hydra.registration import register_agent_in_hydra
 
         with patch("bindu.auth.hydra.registration.app_settings") as mock_settings:
             mock_settings.hydra.auto_register_agents = False
@@ -262,7 +261,6 @@ class TestRegisterAgentInHydra:
     @pytest.mark.asyncio
     async def test_registration_with_existing_credentials(self):
         """Test when credentials already exist."""
-        from bindu.auth.hydra.registration import register_agent_in_hydra
 
         mock_creds = AgentCredentials(
             agent_id="test-agent",
@@ -292,7 +290,6 @@ class TestRegisterAgentInHydra:
     @pytest.mark.asyncio
     async def test_registration_client_exists_in_hydra(self):
         """Test when client already exists in Hydra but not locally."""
-        from bindu.auth.hydra.registration import register_agent_in_hydra
 
         with patch("bindu.auth.hydra.registration.app_settings") as mock_settings:
             mock_settings.hydra.auto_register_agents = True

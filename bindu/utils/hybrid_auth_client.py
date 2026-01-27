@@ -114,7 +114,7 @@ class HybridAuthClient:
         # Make request
         async with AsyncHTTPClient(base_url=base_url) as client:
             response = await client.post(path, headers=auth_headers, data=body_str)
-            
+
             if response.status == 401:
                 # Token might be expired, refresh and retry
                 logger.info("Token expired, refreshing...")
@@ -173,7 +173,7 @@ class HybridAuthClient:
         # Make request
         async with AsyncHTTPClient(base_url=base_url) as client:
             response = await client.get(path, headers=auth_headers)
-            
+
             if response.status == 401:
                 # Token might be expired, refresh and retry
                 logger.info("Token expired, refreshing...")

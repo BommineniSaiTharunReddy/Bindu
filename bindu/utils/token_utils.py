@@ -54,7 +54,7 @@ async def get_client_credentials_token(
             timeout=app_settings.hydra.timeout,
         ) as client:
             response = await client.post("/oauth2/token", headers=headers, data=data)
-            
+
             if response.status == 200:
                 result = await response.json()
                 logger.debug(f"Token obtained for client: {client_id}")

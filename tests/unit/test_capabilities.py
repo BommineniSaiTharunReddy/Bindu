@@ -55,7 +55,7 @@ class TestGetX402ExtensionFromCapabilities:
         )
         mock_manifest = MagicMock()
         mock_manifest.capabilities.get.return_value = [mock_x402]
-        
+
         result = get_x402_extension_from_capabilities(mock_manifest)
         assert result is mock_x402
 
@@ -63,6 +63,6 @@ class TestGetX402ExtensionFromCapabilities:
         """Test when X402 extension is not present."""
         mock_manifest = MagicMock()
         mock_manifest.capabilities.get.return_value = []
-        
+
         result = get_x402_extension_from_capabilities(mock_manifest)
         assert result is None

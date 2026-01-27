@@ -11,7 +11,7 @@ class TestValidateDIDExtension:
         """Test valid DID extension."""
         mock_ext = MagicMock()
         mock_ext.did = "did:key:test"
-        
+
         is_valid, error = validate_did_extension(mock_ext, "did")
         assert is_valid is True
         assert error is None
@@ -26,7 +26,7 @@ class TestValidateDIDExtension:
         """Test DID extension missing required attribute."""
         mock_ext = MagicMock()
         del mock_ext.did
-        
+
         is_valid, error = validate_did_extension(mock_ext, "did")
         assert is_valid is False
         assert "missing 'did' attribute" in error
@@ -35,7 +35,7 @@ class TestValidateDIDExtension:
         """Test validation with different required attribute."""
         mock_ext = MagicMock()
         mock_ext.get_agent_info = lambda: {}
-        
+
         is_valid, error = validate_did_extension(mock_ext, "get_agent_info")
         assert is_valid is True
         assert error is None
@@ -48,7 +48,7 @@ class TestCheckDIDMatch:
         """Test matching DIDs."""
         mock_ext = MagicMock()
         mock_ext.did = "did:key:test123"
-        
+
         result = check_did_match(mock_ext, "did:key:test123")
         assert result is True
 
@@ -56,6 +56,6 @@ class TestCheckDIDMatch:
         """Test non-matching DIDs."""
         mock_ext = MagicMock()
         mock_ext.did = "did:key:test123"
-        
+
         result = check_did_match(mock_ext, "did:key:different")
         assert result is False

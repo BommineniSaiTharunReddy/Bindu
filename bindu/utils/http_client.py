@@ -19,7 +19,7 @@ logger = get_logger("bindu.utils.http_client")
 
 class AsyncHTTPClient:
     """Async HTTP client with automatic retry, session management, and error handling.
-    
+
     Features:
     - Automatic session management with context manager support
     - Exponential backoff retry logic
@@ -111,13 +111,17 @@ class AsyncHTTPClient:
             aiohttp.ClientError: If request fails after all retries
         """
         await self._ensure_session()
-        
+
         # Build full URL
-        url = f"{self.base_url}{endpoint}" if endpoint.startswith("/") else f"{self.base_url}/{endpoint}"
-        
+        url = (
+            f"{self.base_url}{endpoint}"
+            if endpoint.startswith("/")
+            else f"{self.base_url}/{endpoint}"
+        )
+
         # Merge headers
         request_headers = {**self.default_headers, **(headers or {})}
-        
+
         # Default retry on server errors
         retry_statuses = retry_on_status or list(range(500, 600))
 
@@ -133,8 +137,11 @@ class AsyncHTTPClient:
                     **kwargs,
                 ) as response:
                     # Check if we should retry
-                    if response.status in retry_statuses and attempt < self.max_retries - 1:
-                        wait_time = 2 ** attempt  # Exponential backoff
+                    if (
+                        response.status in retry_statuses
+                        and attempt < self.max_retries - 1
+                    ):
+                        wait_time = 2**attempt  # Exponential backoff
                         logger.warning(
                             f"{method} {url} returned {response.status}, "
                             f"retrying in {wait_time}s (attempt {attempt + 1}/{self.max_retries})"
@@ -146,20 +153,22 @@ class AsyncHTTPClient:
                     response_data = await response.read()
                     # Store data in response for later access
                     response._body = response_data
-                    
+
                     logger.debug(f"{method} {url} -> {response.status}")
                     return response
 
             except (aiohttp.ClientConnectorError, aiohttp.ServerDisconnectedError) as e:
                 if attempt < self.max_retries - 1:
-                    wait_time = 2 ** attempt
+                    wait_time = 2**attempt
                     logger.warning(
                         f"Connection error: {e}, retrying in {wait_time}s "
                         f"(attempt {attempt + 1}/{self.max_retries})"
                     )
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error(f"Request failed after {self.max_retries} retries: {e}")
+                    logger.error(
+                        f"Request failed after {self.max_retries} retries: {e}"
+                    )
                     raise
 
         raise aiohttp.ClientError(f"Request failed after {self.max_retries} retries")
@@ -183,7 +192,9 @@ class AsyncHTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("GET", endpoint, params=params, headers=headers, **kwargs)
+        return await self.request(
+            "GET", endpoint, params=params, headers=headers, **kwargs
+        )
 
     async def post(
         self,
@@ -206,7 +217,9 @@ class AsyncHTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("POST", endpoint, data=data, json=json, headers=headers, **kwargs)
+        return await self.request(
+            "POST", endpoint, data=data, json=json, headers=headers, **kwargs
+        )
 
     async def put(
         self,
@@ -229,7 +242,9 @@ class AsyncHTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("PUT", endpoint, data=data, json=json, headers=headers, **kwargs)
+        return await self.request(
+            "PUT", endpoint, data=data, json=json, headers=headers, **kwargs
+        )
 
     async def delete(
         self,
@@ -271,7 +286,9 @@ class AsyncHTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("PATCH", endpoint, data=data, json=json, headers=headers, **kwargs)
+        return await self.request(
+            "PATCH", endpoint, data=data, json=json, headers=headers, **kwargs
+        )
 
 
 @asynccontextmanager

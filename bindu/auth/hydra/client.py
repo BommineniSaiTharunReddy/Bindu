@@ -8,7 +8,6 @@ from __future__ import annotations as _annotations
 from typing import Any, Dict, Optional
 from urllib.parse import quote
 
-from bindu.common.models import TokenIntrospectionResult, OAuthClient
 from bindu.utils.http_client import AsyncHTTPClient
 from bindu.utils.logging import get_logger
 
@@ -42,7 +41,7 @@ class HydraClient:
         self.public_url = (
             public_url.rstrip("/") if public_url else admin_url.replace("4445", "4444")
         )
-        
+
         # Use the reusable HTTP client
         self._http_client = AsyncHTTPClient(
             base_url=self.admin_url,
@@ -90,7 +89,9 @@ class HydraClient:
         }
 
         try:
-            response = await self._http_client.post("/admin/oauth2/introspect", data=data)
+            response = await self._http_client.post(
+                "/admin/oauth2/introspect", data=data
+            )
 
             if response.status != 200:
                 error_text = await response.text()
@@ -144,7 +145,9 @@ class HydraClient:
         try:
             # URL-encode client_id to handle DIDs with colons and special characters
             encoded_client_id = quote(client_id, safe="")
-            response = await self._http_client.get(f"/admin/clients/{encoded_client_id}")
+            response = await self._http_client.get(
+                f"/admin/clients/{encoded_client_id}"
+            )
 
             if response.status == 200:
                 return await response.json()
@@ -155,7 +158,7 @@ class HydraClient:
                 raise ValueError(f"Failed to get OAuth client: {error_text}")
 
         except Exception as e:
-            if hasattr(e, 'status') and e.status == 404:
+            if hasattr(e, "status") and e.status == 404:
                 return None
             logger.error(f"Failed to get OAuth client: {e}")
             raise
@@ -199,7 +202,9 @@ class HydraClient:
         try:
             # URL-encode client_id to handle DIDs with colons and special characters
             encoded_client_id = quote(client_id, safe="")
-            response = await self._http_client.delete(f"/admin/clients/{encoded_client_id}")
+            response = await self._http_client.delete(
+                f"/admin/clients/{encoded_client_id}"
+            )
 
             if response.status in (200, 204):
                 return True
@@ -210,7 +215,7 @@ class HydraClient:
                 raise ValueError(f"Failed to delete OAuth client: {error_text}")
 
         except Exception as e:
-            if hasattr(e, 'status') and e.status == 404:
+            if hasattr(e, "status") and e.status == 404:
                 return False
             logger.error(f"Failed to delete OAuth client: {e}")
             raise

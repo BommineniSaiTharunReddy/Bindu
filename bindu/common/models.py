@@ -256,7 +256,7 @@ class AgentManifest:
 @dataclass(frozen=True)
 class TokenIntrospectionResult:
     """Result of OAuth token introspection.
-    
+
     Standard OAuth 2.0 token introspection response as defined in RFC 7662.
     """
 
@@ -278,7 +278,7 @@ class TokenIntrospectionResult:
 @dataclass(frozen=True)
 class OAuthClient:
     """OAuth2 client configuration.
-    
+
     Represents an OAuth 2.0 client registration as defined in RFC 7591.
     """
 
@@ -286,7 +286,9 @@ class OAuthClient:
     client_name: str | None = None
     client_secret: str | None = None
     redirect_uris: list[str] = field(default_factory=list)
-    grant_types: list[str] = field(default_factory=lambda: ["authorization_code", "refresh_token"])
+    grant_types: list[str] = field(
+        default_factory=lambda: ["authorization_code", "refresh_token"]
+    )
     response_types: list[str] = field(default_factory=lambda: ["code"])
     scope: str = "openid offline"
     token_endpoint_auth_method: str = "client_secret_basic"
@@ -296,7 +298,7 @@ class OAuthClient:
 @dataclass
 class AgentCredentials:
     """Agent OAuth credentials storage.
-    
+
     Stores OAuth client credentials for a Bindu agent registered in Hydra.
     """
 
