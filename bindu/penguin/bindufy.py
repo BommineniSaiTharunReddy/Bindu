@@ -301,6 +301,7 @@ def bindufy(
     )
 
     # Register agent in Hydra if authentication is enabled with Hydra provider
+    credentials = None
     if app_settings.auth.enabled and app_settings.auth.provider == "hydra":
         logger.info(
             "Registering agent in Hydra OAuth2 server with DID-based authentication..."
@@ -379,7 +380,12 @@ def bindufy(
     if run_server:
         # Display server startup banner
         prepare_server_display(
-            host=host, port=port, agent_id=agent_id, agent_did=did_extension.did
+            host=host,
+            port=port,
+            agent_id=agent_id,
+            agent_did=did_extension.did,
+            client_id=credentials.client_id if credentials else None,
+            client_secret=credentials.client_secret if credentials else None,
         )
 
         # Run server with graceful shutdown handling

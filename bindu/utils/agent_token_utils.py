@@ -6,7 +6,6 @@ including getting tokens for agents and validating tokens.
 
 from __future__ import annotations as _annotations
 
-import base64
 from typing import Optional
 
 from bindu.auth.hydra.registration import load_agent_credentials
@@ -31,18 +30,16 @@ async def get_client_credentials_token(
         Token response dict with access_token, token_type, expires_in
     """
     try:
-        # Prepare basic auth
-        auth_string = f"{client_id}:{client_secret}"
-        auth_bytes = auth_string.encode("utf-8")
-        auth_b64 = base64.b64encode(auth_bytes).decode("utf-8")
-
+        # Use client_secret_post (credentials in body) instead of client_secret_basic
+        # because DIDs contain colons which break HTTP Basic auth
         headers = {
-            "Authorization": f"Basic {auth_b64}",
             "Content-Type": "application/x-www-form-urlencoded",
         }
 
         data = {
             "grant_type": "client_credentials",
+            "client_id": client_id,
+            "client_secret": client_secret,
         }
 
         if scope:

@@ -119,12 +119,6 @@ async def register_agent_in_hydra(
         logger.info("Hydra auto-registration disabled, skipping")
         return None
 
-    # Check if credentials already exist (lookup by DID)
-    existing_creds = load_agent_credentials(did, credentials_dir)
-    if existing_creds:
-        logger.info(f"OAuth credentials already exist for DID: {did}")
-        return existing_creds
-
     # Use DID as client_id for hybrid authentication
     client_id = did
     client_secret = secrets.token_urlsafe(32)
@@ -140,14 +134,28 @@ async def register_agent_in_hydra(
         ) as hydra:
             # Check if client already exists in Hydra
             existing_client = await hydra.get_oauth_client(client_id)
+            
             if existing_client:
-                logger.info(f"OAuth client already exists in Hydra: {client_id}")
-                # We don't have the secret for existing clients, so we can't return it
-                logger.warning(
-                    f"Client {client_id} exists but credentials not found locally. "
-                    "You may need to delete and recreate the client."
-                )
-                return None
+                # Client exists in Hydra - check if we have local credentials
+                existing_creds = load_agent_credentials(did, credentials_dir)
+                if existing_creds:
+                    logger.info(f"OAuth credentials verified for DID: {did}")
+                    return existing_creds
+                else:
+                    # Client exists in Hydra but no local credentials - delete and recreate
+                    logger.warning(
+                        f"Client {client_id} exists in Hydra but no local credentials. "
+                        "Deleting and recreating..."
+                    )
+                    await hydra.delete_oauth_client(client_id)
+            else:
+                # Client doesn't exist in Hydra - check if we have stale local credentials
+                existing_creds = load_agent_credentials(did, credentials_dir)
+                if existing_creds:
+                    logger.warning(
+                        f"Local credentials exist for {did} but client not found in Hydra. "
+                        "Creating new client..."
+                    )
 
             # Extract public key from DID extension if available
             public_key = None
@@ -172,7 +180,7 @@ async def register_agent_in_hydra(
                 "grant_types": app_settings.hydra.default_grant_types,
                 "response_types": ["code", "token"],
                 "scope": " ".join(app_settings.hydra.default_agent_scopes),
-                "token_endpoint_auth_method": "client_secret_basic",
+                "token_endpoint_auth_method": "client_secret_post",
                 "metadata": {
                     "agent_id": agent_id,
                     "agent_url": agent_url,
