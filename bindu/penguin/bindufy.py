@@ -28,6 +28,7 @@ from bindu.penguin.manifest import create_manifest, validate_agent_function
 from bindu.settings import app_settings
 from bindu.utils import add_extension_to_capabilities
 from bindu.utils.config_loader import (
+    create_auth_config_from_env,
     create_storage_config_from_env,
     create_scheduler_config_from_env,
     create_sentry_config_from_env,
@@ -152,8 +153,6 @@ def bindufy(
             "description": "A helpful assistant",
             "capabilities": {"streaming": True},
             "deployment": {"url": "http://localhost:3773", "protocol_version": "1.0.0"},
-            "storage": {"type": "memory"},
-            "scheduler": {"type": "memory"}
         }
 
         manifest = bindufy(agent, config, my_handler)
@@ -166,11 +165,6 @@ def bindufy(
 
     validated_config = ConfigValidator.validate_and_process(config)
 
-    # Update app_settings.auth based on config
-    auth_config = validated_config.get("auth")
-    if auth_config is not None:
-        update_auth_settings(auth_config)
-
     # Generate agent_id if not provided
     agent_id = validated_config.get("id", uuid4().hex)
 
@@ -179,6 +173,11 @@ def bindufy(
     storage_config = create_storage_config_from_env(validated_config)
     scheduler_config = create_scheduler_config_from_env(validated_config)
     sentry_config = create_sentry_config_from_env(validated_config)
+    auth_config = create_auth_config_from_env(validated_config)
+
+    # Update app_settings.auth based on config
+    if auth_config is not None:
+        update_auth_settings(auth_config)
 
     # Validate that this is a protocol-compliant function
     handler_name = getattr(handler, "__name__", "<unknown>")
@@ -301,6 +300,36 @@ def bindufy(
         f"Manifest: {_manifest.name} v{_manifest.version} | {_manifest.kind} | {skill_count} skills | {_manifest.url}"
     )
 
+    # Register agent in Hydra if authentication is enabled with Hydra provider
+    credentials = None
+    if app_settings.auth.enabled and app_settings.auth.provider == "hydra":
+        logger.info(
+            "Registering agent in Hydra OAuth2 server with DID-based authentication..."
+        )
+        import asyncio
+        from bindu.auth.hydra.registration import register_agent_in_hydra
+
+        credentials = asyncio.run(
+            register_agent_in_hydra(
+                agent_id=str(agent_id),
+                agent_name=validated_config["name"],
+                agent_url=agent_url,
+                did=did_extension.did,
+                credentials_dir=caller_dir / app_settings.did.pki_dir,
+                did_extension=did_extension,  # Pass DID extension for public key extraction
+            )
+        )
+
+        if credentials:
+            logger.info(
+                f"✅ Agent registered with OAuth client ID: {credentials.client_id}"
+            )
+        else:
+            logger.warning(
+                "⚠️  Agent registration in Hydra failed or was skipped. "
+                "Authentication may not work correctly."
+            )
+
     logger.info(f"Starting deployment for agent: {agent_id}")
 
     # Import server components (deferred to avoid circular import)
@@ -351,7 +380,12 @@ def bindufy(
     if run_server:
         # Display server startup banner
         prepare_server_display(
-            host=host, port=port, agent_id=agent_id, agent_did=did_extension.did
+            host=host,
+            port=port,
+            agent_id=agent_id,
+            agent_did=did_extension.did,
+            client_id=credentials.client_id if credentials else None,
+            client_secret=credentials.client_secret if credentials else None,
         )
 
         # Run server with graceful shutdown handling
