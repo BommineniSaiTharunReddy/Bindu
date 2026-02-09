@@ -10,12 +10,12 @@ Or set environment variables directly and run: python examples/agno_example.py
 from bindu.penguin.bindufy import bindufy
 from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.models.Open import OpenAIChat
+from agno.models.openrouter import OpenRouter
 
 # Define your agent
 agent = Agent(
     instructions="You are a research assistant that finds and summarizes information.",
-    model=OpenAIChat(id="gpt-4o"),
+    model=OpenRouter(id="openai/gpt-4o"),
     tools=[DuckDuckGoTools()],
 )
 
@@ -28,13 +28,7 @@ config = {
     "description": "A research assistant agent",
     "deployment": {"url": "http://localhost:3773", "expose": True},
     "skills": ["skills/question-answering", "skills/pdf-processing"],
-    "execution_cost": {
-        "amount": "$0.0001",
-        "token": "USDC",
-        "network": "base-sepolia",
-        "pay_to_address": "0x2654bb8B272f117c514aAc3d4032B1795366BA5d",
-        "protected_methods": ["message/send"],
-    },
+    
     # Negotiation API keys loaded from: OPENROUTER_API_KEY, MEM0_API_KEY, EXA_API_KEY
 }
 
