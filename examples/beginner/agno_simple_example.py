@@ -7,6 +7,7 @@ Run with: bindu examples/agno_simple_example.py
 Or set environment variables directly and run: python examples/agno_simple_example.py
 """
 
+import os
 from bindu.penguin.bindufy import bindufy
 from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
@@ -19,10 +20,9 @@ load_dotenv()
 # Define your agent
 agent = Agent(
     instructions="You are a research assistant that finds and summarizes information.",
-    model=OpenRouter(id="gpt-4o", api_key=OPENROUTER_API_KEY),
+    model=OpenRouter(id="openai/gpt-oss-120b", api_key=os.getenv("OPENROUTER_API_KEY")),
     tools=[DuckDuckGoTools()],
 )
-
 
 # Configuration
 # Note: Infrastructure configs (storage, scheduler, sentry, API keys) are now

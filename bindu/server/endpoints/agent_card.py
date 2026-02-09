@@ -92,7 +92,6 @@ def create_agent_card(app: BinduApplication) -> AgentCard:
         description=manifest.description or "An AI agent exposed as an A2A agent.",
         url=app.url,
         version=app.version,
-        protocol_version=__version__,
         skills=minimal_skills,
         capabilities=capabilities,
         kind=manifest.kind,

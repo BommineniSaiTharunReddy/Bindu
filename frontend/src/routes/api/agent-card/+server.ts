@@ -30,23 +30,12 @@ export async function GET() {
 
 		const agentCard = await response.json();
 
-		return json({
-			name: agentCard.name || "Bindu Agent",
-			description: agentCard.description || null,
-			url: binduBaseUrl,
-			version: agentCard.version || null,
-			skills: agentCard.skills || [],
-			capabilities: agentCard.capabilities || {},
-		});
+		// Return the full agent card data
+		return json(agentCard);
 	} catch (e) {
 		console.error("Failed to fetch agent card:", e);
-		return json({
-			name: "Bindu Agent",
-			description: "Could not connect to agent",
-			url: binduBaseUrl,
-			version: null,
-			skills: [],
-			capabilities: {},
+		return error(500, {
+			message: "Failed to fetch agent card from backend"
 		});
 	}
 }
