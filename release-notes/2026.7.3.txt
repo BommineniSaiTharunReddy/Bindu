@@ -66,7 +66,7 @@ Route Changes in BinduApplication:
   Removed:
     - GET /docs → _docs_endpoint
     - GET /favicon.ico → _favicon_endpoint
-  
+
   Remaining Core Routes:
     - GET/HEAD/OPTIONS /.well-known/agent.json (agent card)
     - GET / (redirect to agent card)
