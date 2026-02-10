@@ -228,12 +228,6 @@ class BinduApplication(Starlette):
             with_app=True,
         )
 
-        # Docs/Chat UI endpoint
-        self._add_route("/docs", self._docs_endpoint, ["GET"], with_app=False)
-
-        # Favicon endpoint
-        self._add_route("/favicon.ico", self._favicon_endpoint, ["GET"], with_app=False)
-
         if self._x402_ext:
             self._register_payment_endpoints()
 

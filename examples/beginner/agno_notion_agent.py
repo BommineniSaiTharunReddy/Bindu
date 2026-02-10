@@ -108,3 +108,6 @@ def handler(messages: list[dict[str, str]]):
 # Start the agent with Bindu
 # -----------------------------
 bindufy(config, handler)
+
+# if you want to use tunnel to expose your agent to the internet, use the following command
+#bindufy(config, handler, launch=True)

@@ -157,7 +157,7 @@ HYDRA__PUBLIC_URL=https://hydra.getbindu.com
 DATABASE_URL=postgresql+asyncpg://user:pass@host/db  # pragma: allowlist secret
 
 # Redis for advanced scheduling
-REDIS_URL=rediss://default:pass@host:6379
+REDIS_URL=rediss://default:pass@host:6379  # pragma: allowlist secret
 ```
 
 ### Quick Setup Script

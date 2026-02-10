@@ -67,3 +67,6 @@ config = {
 
 # Run the Bindu wrapper
 bindufy(config, handler)
+
+# if you want to use tunnel to expose your agent to the internet, use the following command
+#bindufy(config, handler, launch=True)
