@@ -5,6 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+import sys
 
 from bindu.extensions.did.did_agent_extension import DIDAgentExtension
 from bindu.settings import app_settings
@@ -281,18 +282,22 @@ class TestDIDAgentExtension:
         private_key = ext2.private_key
         assert private_key is not None
 
+
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Windows does not enforce Unix-style chmod permissions"
+    )
     def test_file_permissions(self, did_extension):
         """Test that private key has correct file permissions."""
+
         did_extension.generate_and_save_key_pair()
 
-        # Check private key permissions (should be 0o600)
         import stat
 
         private_key_stat = did_extension.private_key_path.stat()
         private_key_mode = stat.S_IMODE(private_key_stat.st_mode)
         assert private_key_mode == 0o600
 
-        # Check public key permissions (should be 0o644)
         public_key_stat = did_extension.public_key_path.stat()
         public_key_mode = stat.S_IMODE(public_key_stat.st_mode)
         assert public_key_mode == 0o644
